@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <log/log.h>
 
 #include "gki.h"
 #include "hcimsgs.h"
@@ -181,6 +182,13 @@ void l2c_rcv_acl_data (BT_HDR *p_msg)
     STREAM_TO_UINT16 (hci_len, p);
     p_msg->offset += 4;
     L2CAP_TRACE_VERBOSE("%s: received packet from handle(%04x) of len (%d)", __FUNCTION__, handle, hci_len);
+
+    if (hci_len < L2CAP_PKT_OVERHEAD) {
+        /* Must receive at least the L2CAP length and CID */
+        L2CAP_TRACE_WARNING ("L2CAP - got incorrect hci header");
+        android_errorWriteLog(0x534e4554, "34946955");
+        return;
+    }
 
 #if (L2CAP_HOST_FLOW_CTRL == TRUE)
     /* Send ack if we hit the threshold */
