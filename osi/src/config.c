@@ -10,6 +10,8 @@
 #include "config.h"
 #include "list.h"
 
+#include "log/log.h"
+
 typedef struct {
   char *key;
   char *value;
@@ -155,16 +157,39 @@ void config_set_string(config_t *config, const char *section, const char *key, c
     }
   }
 
+  char* value_string = (char*)value;
+  char* value_no_newline = NULL;
+  char* newline_ptr = strstr(value_string, "\n");
+  if (newline_ptr != NULL) {
+    android_errorWriteLog(0x534e4554, "70808273");
+    size_t newline_position = newline_ptr - value_string;
+    value_no_newline = malloc(newline_position + 1);
+    if (value_no_newline == NULL) {
+        ALOGE("%s: Unable to allocate memory for value_no_newline", __func__);
+        return;
+    }
+
+    strncpy(value_no_newline, value_string, newline_position);
+    *(value_no_newline + newline_position) = '\0';
+  } else {
+    value_no_newline = value_string;
+  }
+
+
   for (const list_node_t *node = list_begin(sec->entries); node != list_end(sec->entries); node = list_next(node)) {
     entry_t *entry = list_node(node);
     if (!strcmp(entry->key, key)) {
       free(entry->value);
-      entry->value = strdup(value);
+      entry->value = strdup(value_no_newline);
+      if (newline_ptr != NULL)
+        free(value_no_newline);
       return;
     }
   }
 
-  entry_t *entry = entry_new(key, value);
+  entry_t *entry = entry_new(key, value_no_newline);
+  if (newline_ptr != NULL)
+    free(value_no_newline);
   list_append(sec->entries, entry);
 }
 
