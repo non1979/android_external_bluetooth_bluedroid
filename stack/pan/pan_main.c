@@ -229,16 +229,16 @@ void pan_conn_ind_cb (UINT16 handle,
      * For reference, see Table 1 in PAN Profile v1.0 spec.
      * Note: the remote is the initiator.
      */
-    bool is_valid_interaction = false;
+    BOOLEAN is_valid_interaction = FALSE;
     switch (remote_uuid->uu.uuid16)
     {
         case UUID_SERVCLASS_NAP:
         case UUID_SERVCLASS_GN:
             if (local_uuid->uu.uuid16 == UUID_SERVCLASS_PANU)
-                is_valid_interaction = true;
+                is_valid_interaction = TRUE;
             break;
         case UUID_SERVCLASS_PANU:
-            is_valid_interaction = true;
+            is_valid_interaction = TRUE;
             break;
     }
     /*
@@ -248,7 +248,7 @@ void pan_conn_ind_cb (UINT16 handle,
     if ((local_uuid->uu.uuid16 == UUID_SERVCLASS_PANU) &&
         (remote_uuid->uu.uuid16 != UUID_SERVCLASS_PANU))
     {
-        is_valid_interaction = false;
+        is_valid_interaction = FALSE;
     }
     if (!is_valid_interaction)
     {
