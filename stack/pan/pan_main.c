@@ -634,11 +634,9 @@ void pan_data_buf_ind_cb (UINT16 handle,
             if (pan_cb.pan_data_buf_ind_cb)
                 (*pan_cb.pan_data_buf_ind_cb) (pcb->handle, src, dst, protocol, p_buf, ext, forward);
             else if (pan_cb.pan_data_ind_cb)
-            {
                 (*pan_cb.pan_data_ind_cb) (pcb->handle, src, dst, protocol, p_data, len, ext, forward);
-                GKI_freebuf (p_buf);
-            }
 
+            GKI_freebuf (p_buf);
             return;
         }
 
@@ -661,13 +659,9 @@ void pan_data_buf_ind_cb (UINT16 handle,
     if (pan_cb.pan_data_buf_ind_cb)
         (*pan_cb.pan_data_buf_ind_cb) (pcb->handle, src, dst, protocol, p_buf, ext, forward);
     else if (pan_cb.pan_data_ind_cb)
-    {
         (*pan_cb.pan_data_ind_cb) (pcb->handle, src, dst, protocol, p_data, len, ext, forward);
-        GKI_freebuf (p_buf);
-    }
-    else
-        GKI_freebuf (p_buf);
 
+    GKI_freebuf (p_buf);
     return;
 }
 
