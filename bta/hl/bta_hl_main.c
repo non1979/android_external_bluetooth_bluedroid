@@ -1567,7 +1567,6 @@ static void bta_hl_sdp_query_results(tBTA_HL_CB *p_cb, tBTA_HL_DATA *p_data)
     tBTA_HL_SDP         *p_sdp=NULL;
     tBTA_HL_SDP_OPER    sdp_oper;
     UINT16              event;
-    BOOLEAN             release_sdp_buf=FALSE;
     UNUSED(p_cb);
 
     event = p_data->hdr.event;
@@ -1575,10 +1574,10 @@ static void bta_hl_sdp_query_results(tBTA_HL_CB *p_cb, tBTA_HL_DATA *p_data)
 
     if ( event == BTA_HL_SDP_QUERY_OK_EVT)
     {
+        // this is freed in btif_hl_proc_sdp_query_cfm
         if ((p_sdp = (tBTA_HL_SDP *)GKI_getbuf((UINT16)(sizeof(tBTA_HL_SDP)))) != NULL)
         {
             memcpy(p_sdp, &p_mcb->sdp, sizeof(tBTA_HL_SDP));
-            release_sdp_buf = TRUE;
         }
         else
         {
@@ -1601,11 +1600,6 @@ static void bta_hl_sdp_query_results(tBTA_HL_CB *p_cb, tBTA_HL_DATA *p_data)
     bta_hl_build_sdp_query_cfm(&evt_data,p_mcb->app_id, p_acb->app_handle,
                                p_mcb->bd_addr,p_sdp,status);
     p_acb->p_cback(BTA_HL_SDP_QUERY_CFM_EVT,(tBTA_HL *) &evt_data );
-
-    if (release_sdp_buf)
-    {
-        utl_freebuf((void **) &p_sdp);
-    }
 
     if (p_data->cch_sdp.release_mcl_cb)
     {
